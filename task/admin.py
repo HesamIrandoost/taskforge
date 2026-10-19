@@ -26,7 +26,6 @@ class ProjectMembershipInline(admin.TabularInline):
     autocomplete_fields = ("user",)
 
 
-
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = (

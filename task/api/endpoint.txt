@@ -1,0 +1,7 @@
+api/ 
+x
+projects/   create or list project for user
+projects/slug/  detail project include tasks and comments or update and delete
+projects/slug/tasks/    create or list task for a project
+projects/slug/tasks/(id or uuid)    detail , update , delete
+projects/slug/tasks/(id or uuid)/comments   list or create comments
