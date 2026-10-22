@@ -3,9 +3,20 @@ from task import models
 from account.api.serializers import UserSerializer
 
 
+class TaskOneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Task
+        fields = [
+            "title",
+            "status",
+            "priority",
+        ]
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
-
+    first_task = TaskOneSerializer(read_only=True, many=True)
+    
     class Meta:
         model = models.Project
         fields = [
@@ -14,6 +25,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            'first_task',
             "created_at",
             "updated_at",
         ]
