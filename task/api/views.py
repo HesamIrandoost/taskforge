@@ -47,4 +47,12 @@ class ProjectAPIView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-# class ProjectAPIView(generics)
+class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProjectSerializer    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method in ['GET', 'HEAD']:
+            self.permission_classes = [IsProjectViewer]
+        elif self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            self.permission_classes = [IsProjectMember]
