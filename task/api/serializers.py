@@ -31,6 +31,32 @@ class ProjectSerializer(serializers.ModelSerializer):
         ]
 
 
+        read_only_fields = [
+            'id', 'owner', 'slug', 'first_task', "created_at", "updated_at",
+        ]
+
+
+
+class ProjectRUDSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = models.Project
+        fields = [
+            "id",
+            "owner",
+            "name",
+            "slug",
+            "description",
+            "created_at",
+            "updated_at",
+        ]
+
+
+        read_only_fields = [
+            'id', 'owner', 'slug', "created_at", "updated_at",
+        ]
+
 class TaskSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(read_only=True)
     project_id = ProjectSerializer(write_only=True)

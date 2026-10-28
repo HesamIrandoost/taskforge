@@ -1,4 +1,5 @@
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from ..models import (
     Project, ProjectMembership, Comment, Task
 )
 from .serializers import (
-    ProjectSerializer,
+    ProjectSerializer,ProjectRUDSerializer,
     CommentSerializer,
     TaskSerializer,
     ProjectMembershipSerializer,
@@ -48,11 +49,27 @@ class ProjectAPIView(generics.ListCreateAPIView):
 
 
 class ProjectDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ProjectSerializer    
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectRUDSerializer
+    lookup_field = 'slug'
 
     def get_permissions(self):
-        if self.request.method in ['GET', 'HEAD']:
-            self.permission_classes = [IsProjectViewer]
-        elif self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            self.permission_classes = [IsProjectMember]
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            permission_classes = [IsProjectViewer]
+        elif self.request.method in ("PUT", "PATCH"):
+            permission_classes = [IsProjectOwner]
+        else:
+            permission_classes = [IsProjectOwner]
+
+        return [
+            permission()
+            for permission in permission_classes
+        ]
+
+    def get_queryset(self):
+        return Project.objects.filter(
+            members__user=self.request.user
+        ).select_related(
+            'owner')
+
+    def perform_update(self, serializer):
+        serializer.save(owner=self.request.user)
