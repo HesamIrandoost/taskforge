@@ -6,17 +6,13 @@ from account.api.serializers import UserSerializer
 class TaskOneSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Task
-        fields = [
-            "title",
-            "status",
-            "priority",
-        ]
+        fields = ["id", "title", "status", "priority"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
-    first_task = TaskOneSerializer(read_only=True, many=True)
-    
+    first_tasks = TaskOneSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Project
         fields = [
@@ -25,21 +21,19 @@ class ProjectSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
-            'first_task',
+            "first_tasks",
             "created_at",
             "updated_at",
         ]
-
-
         read_only_fields = [
-            'id', 'owner', 'slug', 'first_task', "created_at", "updated_at",
+            "id", "owner", "slug", "first_tasks",
+            "created_at", "updated_at",
         ]
-
 
 
 class ProjectRUDSerializer(serializers.ModelSerializer):
     owner = UserSerializer(read_only=True)
-    
+
     class Meta:
         model = models.Project
         fields = [
@@ -51,22 +45,23 @@ class ProjectRUDSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-
         read_only_fields = [
-            'id', 'owner', 'slug', "created_at", "updated_at",
+            "id", "owner", "slug",
+            "created_at", "updated_at",
         ]
 
+
 class TaskSerializer(serializers.ModelSerializer):
-    project = ProjectSerializer(read_only=True)
-    project_id = ProjectSerializer(write_only=True)
+    project = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="slug",
+    )
 
     class Meta:
         model = models.Task
         fields = [
             "id",
             "project",
-            "project_id",
             "title",
             "description",
             "status",
@@ -74,32 +69,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    task = TaskSerializer(read_only=True)
-
-    class Meta:
-        model = models.Comment
-        fields = [
-            "id",
-            "user",
-            "task",
-            "body",
-            "created_at",
-        ]
-
-
-class ProjectMembershipSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    project = ProjectSerializer(read_only=True)
-
-    class Meta:
-        model = models.ProjectMembership
-        fields = [
-            "id",
-            "project",
-            "user",
-            "role",
+        read_only_fields = [
+            "id", "project", "created_at", "updated_at",
         ]
